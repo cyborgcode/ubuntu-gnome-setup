@@ -1,0 +1,13 @@
+[Unit]
+Description=Inhibit lid-close suspend while GNOME Caffeine is active
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/caffeine-lid-sync.sh
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=graphical-session.target

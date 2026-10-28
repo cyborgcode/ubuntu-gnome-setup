@@ -1,0 +1,7 @@
+{
+  "uuid": "filee-tray-toggle@local",
+  "name": "Tray icons",
+  "description": "Adds a Quick Settings toggle that hides every tray icon in the top bar, and the Accessibility menu. Open the toggle's menu to check the icons that should stay visible. Apps keep running while their icons are hidden. Filee's and Beeper's tray icons are drawn with custom icons.",
+  "shell-version": ["50"],
+  "version": 4
+}

@@ -1,0 +1,7 @@
+{
+  "uuid": "quick-settings-scroll@rayen.local",
+  "name": "Quick Settings Scroll",
+  "description": "Makes Quick Settings toggle menus scrollable when they are taller than the space left on screen",
+  "shell-version": ["50"],
+  "version": 1
+}
