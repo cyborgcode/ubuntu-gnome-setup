@@ -4,12 +4,9 @@ Everything I added to Ubuntu GNOME, installed on a fresh machine in one go. Made
 
 ## Install on a fresh Ubuntu
 
-The repo is private, so sign in to GitHub first:
-
 ```bash
-sudo apt install -y git gh
-gh auth login
-gh repo clone cyborgcode/ubuntu-gnome-setup ~/ubuntu-gnome-setup
+sudo apt install -y git
+git clone https://github.com/cyborgcode/ubuntu-gnome-setup.git ~/ubuntu-gnome-setup
 ~/ubuntu-gnome-setup/install.sh
 ```
 
