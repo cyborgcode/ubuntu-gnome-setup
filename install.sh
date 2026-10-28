@@ -1,15 +1,28 @@
 #!/usr/bin/env bash
-# Sets up a fresh Ubuntu GNOME with everything this repo describes.
-#   ./install.sh                  runs every step, in order
-#   ./install.sh gaze settings    runs only the steps named
+# Sets up a fresh Ubuntu GNOME with everything this repo describes. It always asks which features to install first:
+#   ./install.sh                  every feature checked
+#   ./install.sh gaze settings    only the features named checked
 # Run it as your normal user, from a terminal in your GNOME session. It asks for your password when apt needs it.
-# Every step is safe to run again: it updates whatever is already there.
+# Every feature is safe to install again: it updates whatever is already there.
 set -uo pipefail
 
 REPO=$(cd -- "$(dirname -- "$0")" && pwd -P)
 EXT_DIR="$HOME/.local/share/gnome-shell/extensions"
-ALL_STEPS=(packages extensions quick-settings-scroll gnome-extensions gaze filee fluxcast gdrive-sync puffdrop
-    caffeine-lid-sync settings)
+# The features the menu offers, in the order they install, and what the menu says about each.
+FEATURES=(extensions quick-settings-scroll gnome-extensions gaze filee fluxcast gdrive-sync puffdrop caffeine-lid-sync
+    settings)
+declare -A ABOUT=(
+    [extensions]='Tray icons: hide tray icons, with exceptions'
+    [quick-settings-scroll]='Quick Settings Scroll: scroll it when too tall'
+    [gnome-extensions]='Caffeine and Clipboard Indicator'
+    [gaze]='Gaze face unlock'
+    [filee]='Filee file converter, started at login'
+    [fluxcast]='FluxCast: cast the screen to a TV'
+    [gdrive-sync]='gdrive-sync: Google Drive sync (signs you in)'
+    [puffdrop]='Puffdrop: AirDrop with iPhones and Macs'
+    [caffeine-lid-sync]='Stay awake with the lid closed while Caffeine is on'
+    [settings]='GNOME settings, extensions list and wallpaper'
+)
 
 # ---- helpers ----------------------------------------------------------------------------------------------------
 
@@ -158,18 +171,45 @@ if [ "$(id -u)" -eq 0 ]; then
     echo "Run this as your normal user, not with sudo. It asks for your password when it needs to." >&2
     exit 1
 fi
-if [ -z "${DBUS_SESSION_BUS_ADDRESS:-}" ]; then
+if [ -z "${DBUS_SESSION_BUS_ADDRESS:-}" ] || [ ! -t 0 ] || [ ! -t 1 ]; then
     echo "Run this from a terminal inside your GNOME session." >&2
     exit 1
 fi
-
-steps=("$@")
-[ ${#steps[@]} -gt 0 ] || steps=("${ALL_STEPS[@]}")
-for step in "${steps[@]}"; do
-    if [[ " ${ALL_STEPS[*]} " != *" $step "* ]]; then
-        echo "Unknown step '$step'. The steps are: ${ALL_STEPS[*]}" >&2
+for step in "$@"; do
+    if [[ " ${FEATURES[*]} " != *" $step "* ]]; then
+        echo "Unknown feature '$step'. The features are: ${FEATURES[*]}" >&2
         exit 1
     fi
+done
+
+# Asks which features to install, with the ones named on the command line checked, or all of them when none are.
+items=()
+for step in "${FEATURES[@]}"; do
+    if [ $# -eq 0 ] || [[ " $* " == *" $step "* ]]; then state=ON; else state=OFF; fi
+    items+=("$step" "${ABOUT[$step]}" "$state")
+done
+if ! choice=$(whiptail --title "Ubuntu GNOME setup" --separate-output --checklist \
+    "Pick what to install. Space checks or unchecks a feature, Enter installs the checked ones." \
+    22 78 ${#FEATURES[@]} "${items[@]}" 3>&1 1>&2 2>&3); then
+    echo "Cancelled. Nothing was installed."
+    exit 1
+fi
+if [ -z "$choice" ]; then
+    echo "Nothing was checked, so nothing was installed."
+    exit 0
+fi
+mapfile -t steps <<<"$choice"
+
+# Most features download or build something with the tools step_packages installs; these three only copy files and
+# write settings.
+for step in "${steps[@]}"; do
+    case "$step" in
+    extensions | caffeine-lid-sync | settings) ;;
+    *)
+        steps=(packages "${steps[@]}")
+        break
+        ;;
+    esac
 done
 
 TMP=$(mktemp -d) || exit 1
@@ -184,15 +224,19 @@ done
 
 echo
 if [ ${#failed[@]} -gt 0 ]; then
-    echo "These steps failed: ${failed[*]}"
-    echo "Fix what the output above says, then run them again with: $0 ${failed[*]}"
+    retry=()
+    for step in "${failed[@]}"; do
+        [ "$step" = packages ] || retry+=("$step")
+    done
+    echo "These failed: ${failed[*]}"
+    echo "Fix what the output above says, then run '$0 ${retry[*]}' to try again."
 else
-    echo "All steps finished."
+    echo "Everything you picked is installed."
 fi
-cat <<'EOF'
-
-Left to do by hand:
-  - Log out and back in. GNOME Shell on Wayland loads new extensions only at login.
-  - Open Gaze and enroll your face, for face unlock.
-EOF
+echo
+echo "Left to do by hand:"
+echo "  - Log out and back in. GNOME Shell on Wayland loads new extensions only at login."
+if [[ " ${steps[*]} " == *" gaze "* ]]; then
+    echo "  - Open Gaze and enroll your face, for face unlock."
+fi
 [ ${#failed[@]} -eq 0 ]

@@ -10,22 +10,25 @@ git clone https://github.com/cyborgcode/ubuntu-gnome-setup.git ~/ubuntu-gnome-se
 ~/ubuntu-gnome-setup/install.sh
 ```
 
-Run it as your normal user, from a terminal in your GNOME session. It asks for your password when apt needs it, and
-gdrive-sync's installer opens the browser to sign you in to Google Drive.
+It first asks which features to install: everything starts checked, Space checks or unchecks one, and Enter installs
+the checked ones. Run it as your normal user, from a terminal in your GNOME session. It asks for your password when apt
+needs it, and gdrive-sync's installer opens the browser to sign you in to Google Drive.
 
 When it finishes:
 
 1. Log out and back in. GNOME Shell on Wayland loads new extensions only at login.
-2. Open Gaze and enroll your face, for face unlock.
+2. If you installed Gaze, open it and enroll your face, for face unlock.
 
-If a step fails, the script says which ones at the end. Fix the problem and run only those again, for example
-`./install.sh gaze fluxcast`. Every step is safe to run again, so `git pull && ./install.sh` also updates a machine.
+If something fails, the script says what at the end. Fix the problem and run it again with those features named, for
+example `./install.sh gaze fluxcast`: the menu then opens with only them checked. Every feature is safe to install
+again, so `git pull && ./install.sh` also updates a machine.
 
 ## What it sets up
 
-| Step | What |
+Most features first install git, curl, unzip, python3 and patch, which they need.
+
+| Feature | What |
 | --- | --- |
-| `packages` | git, curl, unzip, python3 and patch, which the other steps use |
 | `extensions` | This repo's own extension, **Tray icons**: hides tray icons, with exceptions, and draws custom icons for Filee and Beeper |
 | `quick-settings-scroll` | [**Quick Settings Scroll**](https://github.com/cyborgcode/quick-settings-scroll), which scrolls Quick Settings when it is taller than the screen |
 | `gnome-extensions` | **Caffeine** and **Clipboard Indicator** from extensions.gnome.org |
