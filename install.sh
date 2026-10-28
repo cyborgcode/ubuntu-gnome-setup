@@ -8,7 +8,8 @@ set -uo pipefail
 
 REPO=$(cd -- "$(dirname -- "$0")" && pwd -P)
 EXT_DIR="$HOME/.local/share/gnome-shell/extensions"
-ALL_STEPS=(packages extensions gnome-extensions gaze filee fluxcast gdrive-sync puffdrop caffeine-lid-sync settings)
+ALL_STEPS=(packages extensions quick-settings-scroll gnome-extensions gaze filee fluxcast gdrive-sync puffdrop
+    caffeine-lid-sync settings)
 
 # ---- helpers ----------------------------------------------------------------------------------------------------
 
@@ -41,7 +42,7 @@ step_packages() {
     sudo apt-get update && sudo apt-get install -y git curl unzip python3 patch
 }
 
-# This repo's own extensions, which live nowhere else: Tray icons and Quick Settings Scroll.
+# This repo's own extensions, which live nowhere else: Tray icons.
 step_extensions() {
     local dir uuid
     mkdir -p "$EXT_DIR" || return 1
@@ -52,6 +53,12 @@ step_extensions() {
     # Tray icons' saved state (icons hidden, and which apps are exceptions), unless this machine already has one.
     local state="$HOME/.config/filee-tray-toggle/state.json"
     [ -e "$state" ] || install -D -m 600 "$REPO/config/filee-tray-toggle/state.json" "$state"
+}
+
+# Quick Settings Scroll, which scrolls Quick Settings when it is taller than the screen.
+step_quick_settings_scroll() {
+    clone_or_pull https://github.com/cyborgcode/quick-settings-scroll.git "$HOME/quick-settings-scroll" &&
+        "$HOME/quick-settings-scroll/install.sh"
 }
 
 # Caffeine and Clipboard Indicator, from extensions.gnome.org, in the version made for this GNOME Shell.
@@ -113,12 +120,10 @@ step_fluxcast() {
     sudo patch -p1 -s -f -d /opt/fluxcast <"$patch"
 }
 
-# gdrive-sync, with its own installer (which signs you in to Google Drive), then this machine's edited copy of its
-# extension: its folder lists don't scroll on their own, because Quick Settings Scroll scrolls the whole panel.
+# gdrive-sync, with its own installer, which signs you in to Google Drive.
 step_gdrive_sync() {
     clone_or_pull https://github.com/cyborgcode/gdrive-sync.git "$HOME/gdrive-sync" &&
-        (cd "$HOME/gdrive-sync" && bash src/install.sh) &&
-        cp -r "$REPO/overrides/gdrive-sync@local/." "$EXT_DIR/gdrive-sync@local/"
+        (cd "$HOME/gdrive-sync" && bash src/install.sh)
 }
 
 # Puffdrop (AirDrop with iPhones and Macs), with its own setup: the panel, the receiver service and the radio driver.

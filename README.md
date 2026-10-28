@@ -29,18 +29,19 @@ If a step fails, the script says which ones at the end. Fix the problem and run 
 | Step | What |
 | --- | --- |
 | `packages` | git, curl, unzip, python3 and patch, which the other steps use |
-| `extensions` | This repo's own extensions: **Tray icons** (hides tray icons, with exceptions, and draws custom icons for Filee and Beeper) and **Quick Settings Scroll** (scrolls Quick Settings when it is taller than the screen) |
+| `extensions` | This repo's own extension, **Tray icons**: hides tray icons, with exceptions, and draws custom icons for Filee and Beeper |
+| `quick-settings-scroll` | [**Quick Settings Scroll**](https://github.com/cyborgcode/quick-settings-scroll), which scrolls Quick Settings when it is taller than the screen |
 | `gnome-extensions` | **Caffeine** and **Clipboard Indicator** from extensions.gnome.org |
 | `gaze` | **Gaze** face unlock and its extension, from Gundu Labs' apt repository |
 | `filee` | **Filee** file converter from its latest GitHub release, its donut-at-the-cursor extension, and starting it at login |
 | `fluxcast` | **FluxCast** TV casting, the [FluxCast Quick Settings](https://github.com/cyborgcode/fluxcast-gnome-extension) extension, and its patch so FluxCast stops asking which screen to share |
-| `gdrive-sync` | [**gdrive-sync**](https://github.com/cyborgcode/gdrive-sync), then this machine's edited copy of its extension (in `overrides/`) |
+| `gdrive-sync` | [**gdrive-sync**](https://github.com/cyborgcode/gdrive-sync) Google Drive sync and its Quick Settings toggle |
 | `puffdrop` | [**Puffdrop**](https://github.com/cyborgcode/puffdrop) AirDrop: the panel, the receiver and the radio driver |
 | `caffeine-lid-sync` | A user service that keeps the machine awake with the lid closed while Caffeine is on |
 | `settings` | The GNOME settings in `settings.ini` (theme, French keyboard, text size, dock, night light, power, extension settings, which extensions are on) and the wallpaper |
 
-Your own projects (FluxCast Quick Settings, gdrive-sync, Puffdrop) are cloned into your home folder and installed with
-their own installers, so they stay up to date with their repos.
+Your own projects (Quick Settings Scroll, FluxCast Quick Settings, gdrive-sync, Puffdrop) are cloned into your home
+folder and installed with their own installers, so they stay up to date with their repos.
 
 ## Not included
 
